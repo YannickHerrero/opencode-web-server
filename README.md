@@ -7,7 +7,6 @@ Runs OpenCode as a persistent macOS LaunchAgent rooted at `~/dev` and exposes it
 - OpenCode listens only on `127.0.0.1:4096`; it is not exposed on the LAN or public network.
 - Tailscale Serve terminates HTTPS and proxies tailnet traffic to that local port.
 - `launchd` starts the server after graphical login and restarts it after exit or a crash.
-- A native menu-bar utility reports service and proxy state and can pause or resume tailnet access.
 - The Mac must remain awake. Amphetamine manages that policy; this setup deliberately does not duplicate it with `caffeinate`.
 
 ## Install
@@ -17,11 +16,11 @@ Runs OpenCode as a persistent macOS LaunchAgent rooted at `~/dev` and exposes it
 tailscale serve --bg 4096
 ```
 
-`install.zsh` builds and installs the menu-bar utility as well as the web service. The Tailscale Serve configuration is stored by Tailscale and survives restarts.
+The Tailscale Serve configuration is stored by Tailscale and survives restarts.
 
-## Menu-Bar Utility
+## SketchyBar Controls
 
-The OpenCode terminal icon in the macOS menu bar refreshes automatically every 15 seconds and reports:
+This Mac renders its menu bar with SketchyBar. The `OC on` pill is configured in the `macdot` repository at `desktop/config/sketchybar` and refreshes automatically every 15 seconds.
 
 - OpenCode health
 - OpenCode LaunchAgent state
@@ -30,9 +29,7 @@ The OpenCode terminal icon in the macOS menu bar refreshes automatically every 1
 
 Use `Pause Tailnet Access` to disable the HTTPS proxy while leaving OpenCode running locally. `Resume Tailnet Access` restores the proxy to `127.0.0.1:4096`. These controls only modify this HTTPS endpoint and never run `tailscale serve reset`.
 
-The utility is structured as a small Swift package so future menu actions can use the same status and command layers.
-
-The installer places the utility at `~/Applications/OpenCode Status.app`. When Bartender is installed, it adds this item alone to the active profile's visible list so an "all other items" rule does not hide it.
+Click the pill to open the popup. It reports health and proxy status, and provides pause/resume and refresh actions. Future controls belong in the same SketchyBar popup.
 
 ## Access
 
@@ -69,12 +66,6 @@ Disable the service:
 
 ```zsh
 launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.yannickherrero.opencode-web.plist
-```
-
-Disable the menu-bar utility:
-
-```zsh
-launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.yannickherrero.opencode-web-menu.plist
 ```
 
 Remove the Tailscale proxy separately, if wanted:
