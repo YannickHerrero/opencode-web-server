@@ -6,6 +6,7 @@ Runs OpenCode as a persistent macOS LaunchAgent rooted at `~/dev` and exposes it
 
 - OpenCode listens only on `127.0.0.1:4096`; it is not exposed on the LAN or public network.
 - Tailscale Serve terminates HTTPS and proxies tailnet traffic to that local port.
+- OpenCode allows the Tailscale HTTPS origin for browser API requests.
 - `launchd` starts the server after graphical login and restarts it after exit or a crash.
 - The Mac must remain awake. Amphetamine manages that policy; this setup deliberately does not duplicate it with `caffeinate`.
 

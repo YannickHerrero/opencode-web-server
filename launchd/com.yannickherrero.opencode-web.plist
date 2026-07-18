@@ -13,6 +13,8 @@
     <string>4096</string>
     <string>--hostname</string>
     <string>127.0.0.1</string>
+    <string>--cors</string>
+    <string>https://macbook.tailf3d9b7.ts.net</string>
     <string>--print-logs</string>
   </array>
 
