@@ -7,6 +7,7 @@ Runs OpenCode as a persistent macOS LaunchAgent rooted at `~/dev` and exposes it
 - OpenCode listens only on `127.0.0.1:4096`; it is not exposed on the LAN or public network.
 - Tailscale Serve terminates HTTPS and proxies tailnet traffic to that local port.
 - `launchd` starts the server after graphical login and restarts it after exit or a crash.
+- A native menu-bar utility reports service and proxy state and can pause or resume tailnet access.
 - The Mac must remain awake. Amphetamine manages that policy; this setup deliberately does not duplicate it with `caffeinate`.
 
 ## Install
@@ -16,7 +17,20 @@ Runs OpenCode as a persistent macOS LaunchAgent rooted at `~/dev` and exposes it
 tailscale serve --bg 4096
 ```
 
-The Tailscale Serve configuration is stored by Tailscale and survives restarts.
+`install.zsh` builds and installs the menu-bar utility as well as the web service. The Tailscale Serve configuration is stored by Tailscale and survives restarts.
+
+## Menu-Bar Utility
+
+The OpenCode terminal icon in the macOS menu bar refreshes automatically every 15 seconds and reports:
+
+- OpenCode health
+- OpenCode LaunchAgent state
+- Tailscale daemon state
+- Tailnet proxy state
+
+Use `Pause Tailnet Access` to disable the HTTPS proxy while leaving OpenCode running locally. `Resume Tailnet Access` restores the proxy to `127.0.0.1:4096`. These controls only modify this HTTPS endpoint and never run `tailscale serve reset`.
+
+The utility is structured as a small Swift package so future menu actions can use the same status and command layers.
 
 ## Access
 
@@ -53,6 +67,12 @@ Disable the service:
 
 ```zsh
 launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.yannickherrero.opencode-web.plist
+```
+
+Disable the menu-bar utility:
+
+```zsh
+launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.yannickherrero.opencode-web-menu.plist
 ```
 
 Remove the Tailscale proxy separately, if wanted:
