@@ -23,7 +23,10 @@ private final class MenuAppDelegate: NSObject, NSApplicationDelegate {
     private var refreshTimer: Timer?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        statusItem.button?.image = statusImage(named: "terminal.fill")
+        statusItem.button?.title = "OC"
+        statusItem.button?.image = statusImage(named: "terminal.fill", description: "OpenCode Status")
+        statusItem.button?.imagePosition = .imageLeading
+        statusItem.button?.setAccessibilityLabel("OpenCode Status")
         statusItem.button?.toolTip = "OpenCode status is loading"
         rebuildMenu()
         refreshStatus()
@@ -81,7 +84,10 @@ private final class MenuAppDelegate: NSObject, NSApplicationDelegate {
     private func apply(_ snapshot: StatusSnapshot) {
         status = snapshot
         let fullyAvailable = snapshot.openCodeHealthy && snapshot.serviceRunning && snapshot.tailscaleRunning && snapshot.remoteProxyEnabled
-        statusItem.button?.image = statusImage(named: fullyAvailable ? "terminal.fill" : "exclamationmark.triangle.fill")
+        statusItem.button?.image = statusImage(
+            named: fullyAvailable ? "terminal.fill" : "exclamationmark.triangle.fill",
+            description: "OpenCode Status"
+        )
         statusItem.button?.toolTip = tooltip(for: snapshot)
         rebuildMenu()
     }
@@ -135,8 +141,8 @@ private final class MenuAppDelegate: NSObject, NSApplicationDelegate {
         return item
     }
 
-    private func statusImage(named name: String) -> NSImage? {
-        let image = NSImage(systemSymbolName: name, accessibilityDescription: nil)
+    private func statusImage(named name: String, description: String? = nil) -> NSImage? {
+        let image = NSImage(systemSymbolName: name, accessibilityDescription: description)
         image?.isTemplate = true
         return image
     }

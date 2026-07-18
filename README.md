@@ -32,6 +32,8 @@ Use `Pause Tailnet Access` to disable the HTTPS proxy while leaving OpenCode run
 
 The utility is structured as a small Swift package so future menu actions can use the same status and command layers.
 
+The installer places the utility at `~/Applications/OpenCode Status.app`. When Bartender is installed, it adds this item alone to the active profile's visible list so an "all other items" rule does not hide it.
+
 ## Access
 
 | Client | Address |

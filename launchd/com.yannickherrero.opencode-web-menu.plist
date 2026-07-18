@@ -7,7 +7,7 @@
 
   <key>ProgramArguments</key>
   <array>
-    <string>/Users/yannickherrero/Library/Application Support/OpenCodeWebServer/opencode-web-menu</string>
+    <string>/Users/yannickherrero/Applications/OpenCode Status.app/Contents/MacOS/OpenCodeStatus</string>
   </array>
 
   <key>RunAtLoad</key>
