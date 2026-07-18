@@ -2,10 +2,13 @@
 set -euo pipefail
 
 label="com.yannickherrero.opencode-web"
+launcher_label="com.yannickherrero.opencode-web-launcher"
 user_domain="gui/$(id -u)"
 repository_directory="${0:A:h}"
 source_plist="${repository_directory}/launchd/${label}.plist"
+launcher_source_plist="${repository_directory}/launchd/${launcher_label}.plist"
 destination_plist="${HOME}/Library/LaunchAgents/${label}.plist"
+launcher_destination_plist="${HOME}/Library/LaunchAgents/${launcher_label}.plist"
 legacy_menu_label="com.yannickherrero.opencode-web-menu"
 legacy_menu_plist="${HOME}/Library/LaunchAgents/${legacy_menu_label}.plist"
 
@@ -37,10 +40,16 @@ install_agent() {
 }
 
 install_agent "${label}" "${source_plist}" "${destination_plist}"
+install_agent "${launcher_label}" "${launcher_source_plist}" "${launcher_destination_plist}"
 
 if launchctl print "${user_domain}/${legacy_menu_label}" >/dev/null 2>&1; then
   launchctl bootout "${user_domain}/${legacy_menu_label}"
 fi
 rm -f "${legacy_menu_plist}"
 
-print "Installed and started ${label}."
+if command -v tailscale >/dev/null 2>&1; then
+  tailscale serve --bg --yes 4096
+  tailscale serve --bg --yes --set-path=/sessions 4097
+fi
+
+print "Installed and started ${label} and ${launcher_label}."

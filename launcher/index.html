@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#11130f" />
+    <title>OpenCode Sessions</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #11130f;
+        --panel: #191d17;
+        --panel-hover: #22281f;
+        --line: #30382b;
+        --text: #e6eadf;
+        --muted: #929d87;
+        --accent: #a9c78f;
+        --accent-strong: #c8e5ae;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        background:
+          radial-gradient(circle at 85% -10%, rgba(169, 199, 143, 0.13), transparent 34rem),
+          var(--bg);
+        color: var(--text);
+        font-family: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
+      }
+
+      main {
+        width: min(920px, 100%);
+        margin: 0 auto;
+        padding: max(28px, env(safe-area-inset-top)) 18px max(48px, env(safe-area-inset-bottom));
+      }
+
+      header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 28px;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        color: var(--accent);
+        font-size: 12px;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(28px, 5vw, 46px);
+        font-weight: 560;
+        letter-spacing: -0.055em;
+      }
+
+      .actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      button,
+      .home-link {
+        min-height: 42px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--panel);
+        color: var(--text);
+        padding: 0 14px;
+        font: inherit;
+        font-size: 13px;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .home-link {
+        display: inline-flex;
+        align-items: center;
+      }
+
+      button:active,
+      .home-link:active {
+        background: var(--panel-hover);
+      }
+
+      #search {
+        width: 100%;
+        min-height: 50px;
+        margin-bottom: 22px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        outline: none;
+        background: rgba(25, 29, 23, 0.88);
+        color: var(--text);
+        padding: 0 16px;
+        font: inherit;
+        font-size: 16px;
+      }
+
+      #search:focus {
+        border-color: var(--accent);
+      }
+
+      #search::placeholder {
+        color: var(--muted);
+      }
+
+      #status {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .project {
+        margin: 0 0 26px;
+      }
+
+      .project-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 9px;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+      }
+
+      .path {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 11px;
+        overflow-wrap: anywhere;
+      }
+
+      .new-link {
+        flex: none;
+        color: var(--accent);
+        font-size: 12px;
+        text-decoration: none;
+      }
+
+      .sessions {
+        display: grid;
+        gap: 7px;
+      }
+
+      .session {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 14px;
+        align-items: center;
+        min-height: 68px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(25, 29, 23, 0.86);
+        color: inherit;
+        padding: 12px 14px;
+        text-decoration: none;
+      }
+
+      .session:active {
+        background: var(--panel-hover);
+        border-color: var(--accent);
+      }
+
+      .session-title {
+        overflow: hidden;
+        font-size: 14px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .session-meta {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .arrow {
+        color: var(--accent-strong);
+        font-size: 18px;
+      }
+
+      .empty,
+      .error {
+        border: 1px dashed var(--line);
+        border-radius: 12px;
+        color: var(--muted);
+        padding: 22px;
+        text-align: center;
+      }
+
+      .error {
+        color: #e7aa9e;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      @media (max-width: 620px) {
+        header {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .actions {
+          width: 100%;
+        }
+
+        button,
+        .home-link {
+          flex: 1;
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <p class="eyebrow">Tailnet session index</p>
+          <h1>OpenCode Sessions</h1>
+        </div>
+        <div class="actions">
+          <a class="home-link" href="/">OpenCode Home</a>
+          <button id="refresh" type="button">Refresh</button>
+        </div>
+      </header>
+
+      <input id="search" type="search" placeholder="Filter sessions or projects" autocomplete="off" />
+      <p id="status">Loading sessions...</p>
+      <div id="content"></div>
+    </main>
+
+    <script>
+      const content = document.querySelector("#content")
+      const status = document.querySelector("#status")
+      const search = document.querySelector("#search")
+      const refresh = document.querySelector("#refresh")
+      let groups = []
+
+      function encodeDirectory(value) {
+        const bytes = new TextEncoder().encode(value)
+        let binary = ""
+        for (const byte of bytes) binary += String.fromCharCode(byte)
+        return btoa(binary).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "")
+      }
+
+      async function api(path, directory) {
+        const headers = directory ? { "x-opencode-directory": encodeURIComponent(directory) } : {}
+        const response = await fetch(path, { headers })
+        if (!response.ok) throw new Error(`${path} returned HTTP ${response.status}`)
+        return response.json()
+      }
+
+      function sessionHref(directory, id) {
+        return `/${encodeDirectory(directory)}/session/${encodeURIComponent(id)}`
+      }
+
+      function newSessionHref(directory) {
+        return `/${encodeDirectory(directory)}/session`
+      }
+
+      function formatTime(value) {
+        if (!value) return ""
+        return new Intl.DateTimeFormat(undefined, {
+          dateStyle: "medium",
+          timeStyle: "short",
+        }).format(new Date(value))
+      }
+
+      function projectName(directory, home) {
+        if (directory === home) return "Home"
+        const parts = directory.split("/").filter(Boolean)
+        return parts.at(-1) || directory
+      }
+
+      function render() {
+        const query = search.value.trim().toLowerCase()
+        content.replaceChildren()
+        let visibleSessions = 0
+
+        for (const group of groups) {
+          const sessions = group.sessions.filter((session) => {
+            if (!query) return true
+            return `${group.name} ${group.directory} ${session.title}`.toLowerCase().includes(query)
+          })
+          if (query && sessions.length === 0) continue
+
+          visibleSessions += sessions.length
+          const section = document.createElement("section")
+          section.className = "project"
+
+          const heading = document.createElement("div")
+          heading.className = "project-heading"
+          const titleBlock = document.createElement("div")
+          const title = document.createElement("h2")
+          title.textContent = group.name
+          const path = document.createElement("span")
+          path.className = "path"
+          path.textContent = group.directory
+          titleBlock.append(title, path)
+
+          const newLink = document.createElement("a")
+          newLink.className = "new-link"
+          newLink.href = newSessionHref(group.directory)
+          newLink.textContent = "New session"
+          heading.append(titleBlock, newLink)
+
+          const list = document.createElement("div")
+          list.className = "sessions"
+          for (const session of sessions) {
+            const link = document.createElement("a")
+            link.className = "session"
+            link.href = sessionHref(session.directory || group.directory, session.id)
+
+            const info = document.createElement("div")
+            const sessionTitle = document.createElement("div")
+            sessionTitle.className = "session-title"
+            sessionTitle.textContent = session.title || "Untitled session"
+            const meta = document.createElement("div")
+            meta.className = "session-meta"
+            meta.textContent = formatTime(session.time?.updated || session.time?.created)
+            info.append(sessionTitle, meta)
+
+            const arrow = document.createElement("span")
+            arrow.className = "arrow"
+            arrow.textContent = ">"
+            link.append(info, arrow)
+            list.append(link)
+          }
+
+          section.append(heading, list)
+          content.append(section)
+        }
+
+        if (visibleSessions === 0) {
+          const empty = document.createElement("div")
+          empty.className = "empty"
+          empty.textContent = query ? "No matching sessions" : "No sessions found"
+          content.append(empty)
+        }
+      }
+
+      async function load() {
+        refresh.disabled = true
+        status.hidden = false
+        status.textContent = "Loading sessions..."
+        content.replaceChildren()
+
+        try {
+          const [paths, projects] = await Promise.all([api("/path"), api("/project")])
+          const directories = [paths.home]
+          for (const project of projects) {
+            if (project.worktree && project.worktree !== "/" && !directories.includes(project.worktree)) {
+              directories.push(project.worktree)
+            }
+          }
+
+          const results = await Promise.all(
+            directories.map(async (directory) => ({
+              directory,
+              name: projectName(directory, paths.home),
+              sessions: await api("/session", directory),
+            })),
+          )
+
+          const seen = new Set()
+          groups = results
+            .map((group) => ({
+              ...group,
+              sessions: group.sessions
+                .filter((session) => {
+                  if (seen.has(session.id)) return false
+                  seen.add(session.id)
+                  return true
+                })
+                .sort((a, b) => (b.time?.updated || b.time?.created || 0) - (a.time?.updated || a.time?.created || 0)),
+            }))
+            .filter((group) => group.sessions.length > 0)
+
+          const count = groups.reduce((total, group) => total + group.sessions.length, 0)
+          status.textContent = `${count} session${count === 1 ? "" : "s"} across ${groups.length} project${groups.length === 1 ? "" : "s"}`
+          render()
+        } catch (error) {
+          status.textContent = "Unable to load sessions"
+          const message = document.createElement("div")
+          message.className = "error"
+          message.textContent = error instanceof Error ? error.message : String(error)
+          content.append(message)
+        } finally {
+          refresh.disabled = false
+        }
+      }
+
+      search.addEventListener("input", render)
+      refresh.addEventListener("click", load)
+      load()
+    </script>
+  </body>
+</html>

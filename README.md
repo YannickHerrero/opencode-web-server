@@ -38,8 +38,13 @@ Click the pill to open the popup. It reports health and proxy status, and provid
 | --- | --- |
 | Local browser | `http://127.0.0.1:4096` |
 | Tailnet browser | `https://macbook.tailf3d9b7.ts.net` |
+| Tailnet session index | `https://macbook.tailf3d9b7.ts.net/sessions/` |
 | Local TUI | `opencode attach http://127.0.0.1:4096` |
 | Tailnet TUI | `opencode attach https://macbook.tailf3d9b7.ts.net` |
+
+The session index works around OpenCode's browser-local project registry. It reads live project and session data from the OpenCode API in the browser and links directly to canonical session routes; it does not copy or persist session data.
+
+The index is served on loopback port `4097` by `com.yannickherrero.opencode-web-launcher` and exposed only at the `/sessions/` Tailscale path.
 
 ## Verify
 
